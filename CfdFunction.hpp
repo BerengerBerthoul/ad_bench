@@ -41,6 +41,7 @@ T fluxRoe(const std::vector<T>& rho,
   constexpr double gam1_1 = 1./gam1;
   constexpr double rgaz   = 237.;
   
+  #pragma simd
   for(int icell=gh; icell < rho.size() -gh ; icell++)
   {
     auto sc1 = surfx[icell];

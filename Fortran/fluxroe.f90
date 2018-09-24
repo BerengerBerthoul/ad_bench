@@ -54,6 +54,7 @@ subroutine fluxroe(rho,                 &
   rgaz   = 237.
   
   
+  !$DIR SIMD
   do i=1,im
     
     sc1 = surfx(i)

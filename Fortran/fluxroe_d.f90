@@ -78,11 +78,14 @@ SUBROUTINE FLUXROE_D(rho, rhod, velx, velxd, vely, velyd, velz, velzd, &
   gam1 = gam - 1.
   gam1_1 = 1./gam1
   rgaz = 237.
+  
   flux1d = 0.0_8
   flux2d = 0.0_8
   flux3d = 0.0_8
   flux4d = 0.0_8
   flux5d = 0.0_8
+  
+  !$DIR SIMD
   DO i=1,im
     sc1 = surfx(i)
     sc2 = surfy(i)

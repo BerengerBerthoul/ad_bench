@@ -9,6 +9,7 @@ subroutine dfo2_d(dw, dwd, w, wd, im, gh)
   integer :: i
   ! -------------------------------------------------
   
+  !$DIR SIMD
   do i=1,im
     dwd(i) = 0.5d0*(wd(i+1) - wd(i-1))
   end do
