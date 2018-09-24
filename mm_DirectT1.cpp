@@ -4,6 +4,7 @@
 #include <sstream>
 #include <chrono>
 #include <ctime>
+#include <cmath>
 
 #include "CfdFunction.hpp"
 

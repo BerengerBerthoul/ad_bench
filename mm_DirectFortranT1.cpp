@@ -4,6 +4,8 @@
 #include <sstream>
 #include <chrono>
 #include <ctime>
+#include <cmath>
+
 
 #include "CfdFortranExternFunction.hpp"
 
