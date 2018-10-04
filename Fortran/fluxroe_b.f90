@@ -85,11 +85,11 @@ SUBROUTINE FLUXROE_B(rho, rhob, velx, velxb, vely, velyb, velz, velzb, &
   gam1 = gam - 1.
   gam1_1 = 1./gam1
   rgaz = 237.
-  tempb6 = 0.0_8
-  velxb = 0.0_8
-  velyb = 0.0_8
-  velzb = 0.0_8
-  rhob = 0.0_8
+  ! tempb6 = 0.0_8
+  ! velxb = 0.0_8
+  ! velyb = 0.0_8
+  ! velzb = 0.0_8
+  ! rhob = 0.0_8
   DO i=1,im
     sc1 = surfx(i)
     sc2 = surfy(i)

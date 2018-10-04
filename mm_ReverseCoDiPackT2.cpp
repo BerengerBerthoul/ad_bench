@@ -52,57 +52,66 @@ int main(int nargs, char** args)
     surfz[i] = 1.*i; 
   }
   
+  
+  codi::RealReverse::TapeType& tape = codi::RealReverse::getGlobalTape();
+  tape.setActive();    
+    
+  for(int i=0; i < rho.size(); i++)
+  {
+    tape.registerInput(rho[i]);
+    tape.registerInput(velx[i]);
+    tape.registerInput(vely[i]);
+    tape.registerInput(velz[i]);
+    tape.registerInput(temp[i]);
+  }
+  
+  fluxRoe(rho, velx, vely, velz, temp, 
+          surfx, surfy, surfz, 
+          flux1, 
+          flux2, 
+          flux3, 
+          flux4, 
+          flux5, 
+          gh);
+  
+  /* Prepare output */
+  for(int i=0; i < rho.size(); i++)
+  {
+    tape.registerOutput(flux1[i]);
+    tape.registerOutput(flux2[i]);
+    tape.registerOutput(flux3[i]);
+    tape.registerOutput(flux4[i]);
+    tape.registerOutput(flux5[i]);
+  }
+    
+  /* SetUp the end */
+  tape.setPassive();
+  for(int i=0; i < rho.size(); i++)
+  {
+    flux1[i].setGradient(1.*i);
+    flux2[i].setGradient(1.*i);
+    flux3[i].setGradient(1.*i);
+    flux4[i].setGradient(1.*i);
+    flux5[i].setGradient(1.*i);
+  }
+  
   /* 
    * Begin 
    */
   start = std::chrono::system_clock::now();
   for(int ite=0; ite < niter; ite++)
   {
-    codi::RealReverse::TapeType& tape = codi::RealReverse::getGlobalTape();
-    tape.setActive();    
     
     for(int i=0; i < rho.size(); i++)
     {
-      tape.registerInput(rho[i]);
-      tape.registerInput(velx[i]);
-      tape.registerInput(vely[i]);
-      tape.registerInput(velz[i]);
-      tape.registerInput(temp[i]);
+      flux1[i].setGradient(1.*i/(ite+1));
+      flux2[i].setGradient(1.*i/(ite+1));
+      flux3[i].setGradient(1.*i/(ite+1));
+      flux4[i].setGradient(1.*i/(ite+1));
+      flux5[i].setGradient(1.*i/(ite+1));
     }
     
-    fluxRoe(rho, velx, vely, velz, temp, 
-            surfx, surfy, surfz, 
-            flux1, 
-            flux2, 
-            flux3, 
-            flux4, 
-            flux5, 
-            gh);
-    
-    /* Prepare output */
-    for(int i=0; i < rho.size(); i++)
-    {
-      tape.registerOutput(flux1[i]);
-      tape.registerOutput(flux2[i]);
-      tape.registerOutput(flux3[i]);
-      tape.registerOutput(flux4[i]);
-      tape.registerOutput(flux5[i]);
-    }
-    
-    /* SetUp the end */
-    tape.setPassive();
-    for(int i=0; i < rho.size(); i++)
-    {
-      flux1[i].setGradient(1.*i);
-      flux2[i].setGradient(1.*i);
-      flux3[i].setGradient(1.*i);
-      flux4[i].setGradient(1.*i);
-      flux5[i].setGradient(1.*i);
-    }
     tape.evaluate();
-    
-    if(ite != niter - 1) tape.reset();
-    
     
   }
   end = std::chrono::system_clock::now();
@@ -114,5 +123,7 @@ int main(int nargs, char** args)
   std::cout << " ### Elapsed Normal Direct : " << elapsed.count() << std::endl;
   
   std::cout << " ### Results CoDiPack Tangent : " << rho[im/2].getGradient() << std::endl;
+  
+  tape.reset();
   
 }

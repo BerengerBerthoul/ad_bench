@@ -81,11 +81,11 @@ int main(int nargs, char** args)
     /* Reset array */
     for(int i=0; i < rho.size(); i++)
     {
-      flux1d[i] = 1.*i;
-      flux2d[i] = 1.*i;
-      flux3d[i] = 1.*i;
-      flux4d[i] = 1.*i;
-      flux5d[i] = 1.*i;
+      flux1d[i] = 1.*i/(ite+1);
+      flux2d[i] = 1.*i/(ite+1);
+      flux3d[i] = 1.*i/(ite+1);
+      flux4d[i] = 1.*i/(ite+1);
+      flux5d[i] = 1.*i/(ite+1);
     }
     
     fluxroe_b_(rho.data(), 

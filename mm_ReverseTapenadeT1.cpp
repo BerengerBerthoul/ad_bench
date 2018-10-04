@@ -43,6 +43,11 @@ int main(int nargs, char** args)
   start = std::chrono::system_clock::now();
   for(int ite=0; ite < niter; ite++)
   {
+    for(int i=0; i < w.size(); i++)
+    {
+      dwd[i] = 1.*i/(ite+1);
+    }
+    
     dfo2_b_(dw.data(), 
             dwd.data(), 
             w.data(), 

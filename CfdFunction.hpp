@@ -11,7 +11,7 @@ T func(const T& x) {
 
 /* ------------------------------------------------------ */
 template<typename T>
-T stencilO2(const std::vector<T>& w, std::vector<T>& dw, int gh)
+void stencilO2(const std::vector<T>& w, std::vector<T>& dw, int gh)
 {
   for(int icell=gh; icell < w.size() -gh ; icell++)
   {
@@ -21,20 +21,20 @@ T stencilO2(const std::vector<T>& w, std::vector<T>& dw, int gh)
 
 /* ------------------------------------------------------ */
 template<typename T>
-T fluxRoe(const std::vector<T>& rho, 
-          const std::vector<T>& velx, 
-          const std::vector<T>& vely, 
-          const std::vector<T>& velz, 
-          const std::vector<T>& temp, 
-          const std::vector<double>& surfx, 
-          const std::vector<double>& surfy, 
-          const std::vector<double>& surfz, 
-          std::vector<T>& flux1, 
-          std::vector<T>& flux2, 
-          std::vector<T>& flux3, 
-          std::vector<T>& flux4, 
-          std::vector<T>& flux5, 
-          int gh) {
+void fluxRoe(const std::vector<T>& rho, 
+               const std::vector<T>& velx, 
+               const std::vector<T>& vely, 
+               const std::vector<T>& velz, 
+               const std::vector<T>& temp, 
+               const std::vector<double>& surfx, 
+               const std::vector<double>& surfy, 
+               const std::vector<double>& surfz, 
+               std::vector<T>& flux1, 
+               std::vector<T>& flux2, 
+               std::vector<T>& flux3, 
+               std::vector<T>& flux4, 
+               std::vector<T>& flux5, 
+               int gh) {
   
   constexpr double gam    = 1.4;
   constexpr double gam1   = gam-1.;

@@ -50,6 +50,7 @@ int main(int nargs, char** args)
   for(int i=0; i < w.size(); i++){ temp [i] = 1.*i; }
   for(int i=0; i < w.size(); i++){ surfx[i] = 1.*i; }
   for(int i=0; i < w.size(); i++){ surfy[i] = 1.*i; }
+  for(int i=0; i < w.size(); i++){ surfz[i] = 1.*i; }
   
   /* 
    * Begin 

@@ -35,38 +35,28 @@ int main(int nargs, char** args)
   }
   
   /* 
-   * Begin 
+   *  Evaluate Once the tape 
    */
+  codi::RealReverse::TapeType& tape = codi::RealReverse::getGlobalTape();
+  
+  tape.setActive();    
+  for(int i=0; i < w.size(); i++){ tape.registerInput(w[i]); }
+  
+  /* Eval function to build Tape */  
+  stencilO2(w, dw, gh);
+  
+  for(int i=0; i < w.size(); i++){tape.registerOutput(dw[i]); }
+  
+  tape.setPassive();
+  for(int i=0; i < w.size(); i++){dw[i].setGradient(1.*i); }
+  
   start = std::chrono::system_clock::now();
   for(int ite=0; ite < niter; ite++)
   {
-    
-    codi::RealReverse::TapeType& tape = codi::RealReverse::getGlobalTape();
-    tape.setActive();    
-    
-    for(int i=0; i < w.size(); i++)
-    {
-      tape.registerInput(w[i]);
-    }
-    
-    stencilO2(w, dw, gh);
-    
-    /* Prepare output */
-    for(int i=0; i < w.size(); i++)
-    {
-      tape.registerOutput(dw[i]);
-    }
-    
-    /* SetUp the end */
-    tape.setPassive();
-    for(int i=0; i < w.size(); i++)
-    {
-      dw[i].setGradient(1.*i);
-    }
+    for(int i=0; i < w.size(); i++){dw[i].setGradient(1.*i/(ite+1)); }
+      
+    /* Evaluate the tape = Execute Adjoint Code */
     tape.evaluate();
-    
-    if(ite != niter - 1) tape.reset();
-    
   }
   end = std::chrono::system_clock::now();
   
@@ -77,5 +67,7 @@ int main(int nargs, char** args)
   std::cout << " ### Elapsed CoDiPack Reverse : " << elapsed.count() << std::endl;
   
   std::cout << " ### Results CoDiPack Reverse : " << w[im/2].getGradient() << std::endl;
+  
+  tape.reset();
   
 }
