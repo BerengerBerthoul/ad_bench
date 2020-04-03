@@ -21,7 +21,7 @@ file(GLOB_RECURSE cpp_and_fortran_files
 
 ## Compiler flags ##
 # TODO move
-add_compile_options(-Wall -fmax-errors=2 -O3 -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC)
+add_compile_options(-Wall -fmax-errors=2 -Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC)
 
 
 ## Executable ##

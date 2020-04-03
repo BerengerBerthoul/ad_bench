@@ -13,4 +13,4 @@ cmake --build build/ -- -j24 &&
 
 ## launch unit tests ##
 (cd build
-./ad_bench 10 1000000)
+./ad_bench 10 100)

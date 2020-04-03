@@ -25,12 +25,12 @@ double benchmark_centered_gradient_codipack_tangent(int n_iter, int n_cell) {
   
   // Compute
   auto start = std::chrono::system_clock::now();
-  for(int iter=0; iter < n_iter; ++iter) {
+  for(int iter=0; iter<n_iter; ++iter) {
     centered_gradient(w, dw, n_cell, gh);
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient dw: " << dw[n_cell/2].getGradient() << std::endl;
+  std::cout << "gradient dw: " << dw[n_cell/2].getGradient() << "\t";
   return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 }
 
@@ -40,6 +40,10 @@ double benchmark_roe_flux_codipack_tangent(int n_iter, int n_cell) {
   int sz = n_cell+2*gh;
   
   // Creation
+  std::vector<double>      surfx_vec(sz); double*      surfx = surfx_vec.data();
+  std::vector<double>      surfy_vec(sz); double*      surfy = surfy_vec.data();
+  std::vector<double>      surfz_vec(sz); double*      surfz = surfz_vec.data();
+
   std::vector<RealForward>   rho_vec(sz); RealForward*   rho =   rho_vec.data();
   std::vector<RealForward>  velx_vec(sz); RealForward*  velx =  velx_vec.data();
   std::vector<RealForward>  vely_vec(sz); RealForward*  vely =  vely_vec.data();
@@ -50,20 +54,18 @@ double benchmark_roe_flux_codipack_tangent(int n_iter, int n_cell) {
   std::vector<RealForward> flux3_vec(sz); RealForward* flux3 = flux3_vec.data();
   std::vector<RealForward> flux4_vec(sz); RealForward* flux4 = flux4_vec.data();
   std::vector<RealForward> flux5_vec(sz); RealForward* flux5 = flux5_vec.data();
-  std::vector<double>      surfx_vec(sz); double*      surfx = surfx_vec.data();
-  std::vector<double>      surfy_vec(sz); double*      surfy = surfy_vec.data();
-  std::vector<double>      surfz_vec(sz); double*      surfz = surfz_vec.data();
   
   // Initialize fields
-  for(int i=0; i < sz; ++i){
+  for(int i=0; i<sz; ++i){
+    surfx[i] = i; 
+    surfy[i] = i; 
+    surfz[i] = i; 
+
     rho  [i] = i; 
     velx [i] = i; 
     vely [i] = i; 
     velz [i] = i; 
     temp [i] = i; 
-    surfx[i] = i; 
-    surfy[i] = i; 
-    surfz[i] = i; 
 
     rho [i].setGradient(i);
     velx[i].setGradient(i);
@@ -84,7 +86,6 @@ double benchmark_roe_flux_codipack_tangent(int n_iter, int n_cell) {
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "value: " << flux1[n_cell/2].value() << "\n";
-  std::cout << "gradient: " << flux1[n_cell/2].getGradient() << "\n";
+  std::cout << "gradient flux rho: " << flux1[n_cell/2].getGradient() << "\t";
   return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 }

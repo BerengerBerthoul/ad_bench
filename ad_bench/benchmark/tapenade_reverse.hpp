@@ -9,35 +9,35 @@
 using codi::RealForward;
 
 inline
-double benchmark_centered_gradient_tapenade_tangent(int n_iter, int n_cell) {
+double benchmark_centered_gradient_tapenade_reverse(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
   // Creation
   std::vector<double>    w_vec(sz); double* w    =    w_vec.data();
-  std::vector<double>  w_d_vec(sz); double* w_d  =  w_d_vec.data();
   std::vector<double>   dw_vec(sz); double* dw   =   dw_vec.data();
-  std::vector<double> dw_d_vec(sz); double* dw_d = dw_d_vec.data();
+  std::vector<double>  w_b_vec(sz); double* w_b  =  w_b_vec.data();
+  std::vector<double> dw_b_vec(sz); double* dw_b = dw_b_vec.data();
   
   // Initialize
   for (int i=0; i<sz; ++i) {
-      w[i] = i;
-    w_d[i] = i;
+       w[i] = i; // NOTE: unused for this particular operator
+    dw_b[i] = i;
   }
   
   // Compute
   auto start = std::chrono::system_clock::now();
   for(int iter=0; iter<n_iter; ++iter) {
-    centered_gradient_d_(w, w_d, dw, dw_d, n_cell, gh);
+    centered_gradient_b_(w, w_b, dw, dw_b, n_cell, gh);
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient dw: " << dw_d[n_cell/2] << "\t";
+  std::cout << "gradient w: " << w_b[n_cell/2] << "\t";
   return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 }
 
 inline
-double benchmark_roe_flux_tapenade_tangent(int n_iter, int n_cell) {
+double benchmark_roe_flux_tapenade_reverse(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -57,48 +57,48 @@ double benchmark_roe_flux_tapenade_tangent(int n_iter, int n_cell) {
   std::vector<double>   flux4_vec(sz); double* flux4   =   flux4_vec.data();
   std::vector<double>   flux5_vec(sz); double* flux5   =   flux5_vec.data();
 
-  std::vector<double>   rho_d_vec(sz); double*   rho_d =   rho_d_vec.data();
-  std::vector<double>  velx_d_vec(sz); double*  velx_d =  velx_d_vec.data();
-  std::vector<double>  vely_d_vec(sz); double*  vely_d =  vely_d_vec.data();
-  std::vector<double>  velz_d_vec(sz); double*  velz_d =  velz_d_vec.data();
-  std::vector<double>  temp_d_vec(sz); double*  temp_d =  temp_d_vec.data();
-  std::vector<double> flux1_d_vec(sz); double* flux1_d = flux1_d_vec.data();
-  std::vector<double> flux2_d_vec(sz); double* flux2_d = flux2_d_vec.data();
-  std::vector<double> flux3_d_vec(sz); double* flux3_d = flux3_d_vec.data();
-  std::vector<double> flux4_d_vec(sz); double* flux4_d = flux4_d_vec.data();
-  std::vector<double> flux5_d_vec(sz); double* flux5_d = flux5_d_vec.data();
+  std::vector<double>   rho_b_vec(sz); double*   rho_b =   rho_b_vec.data();
+  std::vector<double>  velx_b_vec(sz); double*  velx_b =  velx_b_vec.data();
+  std::vector<double>  vely_b_vec(sz); double*  vely_b =  vely_b_vec.data();
+  std::vector<double>  velz_b_vec(sz); double*  velz_b =  velz_b_vec.data();
+  std::vector<double>  temp_b_vec(sz); double*  temp_b =  temp_b_vec.data();
+  std::vector<double> flux1_b_vec(sz); double* flux1_b = flux1_b_vec.data();
+  std::vector<double> flux2_b_vec(sz); double* flux2_b = flux2_b_vec.data();
+  std::vector<double> flux3_b_vec(sz); double* flux3_b = flux3_b_vec.data();
+  std::vector<double> flux4_b_vec(sz); double* flux4_b = flux4_b_vec.data();
+  std::vector<double> flux5_b_vec(sz); double* flux5_b = flux5_b_vec.data();
   
   // Initialize fields
-  for(int i=0; i<sz; ++i){
-    surfx[i] = i; 
-    surfy[i] = i; 
-    surfz[i] = i; 
+  for(int i=0; i < sz; ++i){
+     surfx[i] = i; 
+     surfy[i] = i; 
+     surfz[i] = i; 
 
-     rho [i] = i; 
-     velx[i] = i; 
-     vely[i] = i; 
-     velz[i] = i; 
-     temp[i] = i; 
+      rho [i] = i; 
+      velx[i] = i; 
+      vely[i] = i; 
+      velz[i] = i; 
+      temp[i] = i; 
 
-     rho_d[i] = i;
-    velx_d[i] = i;
-    vely_d[i] = i;
-    velz_d[i] = i;
-    temp_d[i] = i;
+    flux1_b[i] = i;
+    flux2_b[i] = i;
+    flux3_b[i] = i;
+    flux4_b[i] = i;
+    flux5_b[i] = i;
   }
   
   // Compute
   auto start = std::chrono::system_clock::now();
   for (int iter=0; iter<n_iter; ++iter) {
-    roe_flux_d_(
-      rho, rho_d, velx, velx_d, vely, vely_d, velz, velz_d, temp, temp_d, 
+    roe_flux_b_(
+      rho, rho_b, velx, velx_b, vely, vely_b, velz, velz_b, temp, temp_b, 
       surfx, surfy, surfz, 
-      flux1, flux1_d, flux2, flux2_d, flux3, flux3_d, flux4, flux4_d, flux5, flux5_d, 
+      flux1, flux1_b, flux2, flux2_b, flux3, flux3_b, flux4, flux4_b, flux5, flux5_b, 
       n_cell, gh
     );
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient flux rho: " << flux1_d[n_cell/2] << "\t";
+  std::cout << "gradient rho: " << rho_b[n_cell/2] << "\t";
   return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 }
