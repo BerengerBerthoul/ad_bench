@@ -21,7 +21,7 @@ T stencilO2(const std::vector<T>& w, std::vector<T>& dw, int gh)
 
 /* ------------------------------------------------------ */
 template<typename T>
-T fluxRoe(const std::vector<T>& rho, 
+void fluxRoe(const std::vector<T>& rho, 
           const std::vector<T>& velx, 
           const std::vector<T>& vely, 
           const std::vector<T>& velz, 
@@ -41,8 +41,8 @@ T fluxRoe(const std::vector<T>& rho,
   constexpr double gam1_1 = 1./gam1;
   constexpr double rgaz   = 237.;
   
-  #pragma simd
-  for(int icell=gh; icell < rho.size() -gh ; icell++)
+  #pragma omp simd
+  for(int icell=gh; icell < rho.size()-gh ; icell++)
   {
     auto sc1 = surfx[icell];
     auto sc2 = surfy[icell];
