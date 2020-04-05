@@ -24,6 +24,28 @@ if(NOT codipack_POPULATED)
   FetchContent_Populate(codipack)
 endif()
 set(codipack_include_dir ${codipack_SOURCE_DIR}/include)
+### Google Test (needed by Google Benchmark) ###
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.10.0
+)
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+  FetchContent_Populate(googletest)
+  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+endif()
+### Google Benchmark ###
+FetchContent_Declare(
+  googlebench
+  GIT_REPOSITORY https://github.com/google/benchmark.git
+  GIT_TAG        v1.5.0
+)
+FetchContent_GetProperties(googlebench)
+if(NOT googlebench_POPULATED)
+  FetchContent_Populate(googlebench)
+  add_subdirectory(${googlebench_SOURCE_DIR} ${googlebench_BINARY_DIR})
+endif()
 
 ## Find files ##
 set(src_dir ${PROJECT_SOURCE_DIR}/${PROJECT_NAME})
@@ -49,6 +71,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${codipack_include_dir}>
   $<BUILD_INTERFACE:${include_dir}>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC
+    benchmark
+    gtest
 )
 
 ### Install ###
