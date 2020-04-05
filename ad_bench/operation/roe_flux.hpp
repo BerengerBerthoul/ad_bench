@@ -24,7 +24,7 @@ void roe_flux(
   constexpr double gam1_1 = 1./gam1;
   constexpr double rgaz   = 237.;
   
-  #pragma omp simd
+  // #pragma omp simd TODO: actually makes it slower
   for(int i=gh; i<n_cell-gh ; ++i) {
     auto sc1 = surfx[i];
     auto sc2 = surfy[i];

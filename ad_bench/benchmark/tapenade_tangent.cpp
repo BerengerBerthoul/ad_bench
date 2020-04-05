@@ -1,4 +1,4 @@
-#pragma once
+#include "ad_bench/benchmark/all.hpp"
 
 #include <vector>
 #include <iostream>
@@ -8,8 +8,7 @@
 #include "codi.hpp"
 using codi::RealForward;
 
-inline
-double benchmark_centered_gradient_tapenade_tangent(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_centered_gradient_tapenade_tangent(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -32,12 +31,13 @@ double benchmark_centered_gradient_tapenade_tangent(int n_iter, int n_cell) {
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient dw: " << dw_d[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    dw_d[n_cell/2],
+    std::chrono::duration<double>(end-start).count()
+  );
 }
 
-inline
-double benchmark_roe_flux_tapenade_tangent(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_roe_flux_tapenade_tangent(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -99,6 +99,8 @@ double benchmark_roe_flux_tapenade_tangent(int n_iter, int n_cell) {
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient flux rho: " << flux1_d[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    flux1_d[n_cell/2],
+    std::chrono::duration<double>(end-start).count()
+  );
 }

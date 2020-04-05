@@ -1,4 +1,4 @@
-#pragma once
+#include "ad_bench/benchmark/all.hpp"
 
 #include <vector>
 #include <iostream>
@@ -8,8 +8,7 @@
 #include "codi.hpp"
 using codi::RealForward;
 
-inline
-double benchmark_centered_gradient_tapenade_reverse(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_centered_gradient_tapenade_reverse(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -22,22 +21,27 @@ double benchmark_centered_gradient_tapenade_reverse(int n_iter, int n_cell) {
   // Initialize
   for (int i=0; i<sz; ++i) {
        w[i] = i; // NOTE: unused for this particular operator
-    dw_b[i] = i;
   }
   
   // Compute
   auto start = std::chrono::system_clock::now();
   for(int iter=0; iter<n_iter; ++iter) {
+    // Reset array
+    for(int i=0; i<sz; ++i) {
+      dw_b[i] = double(i)/(iter+1);
+    }
+
     centered_gradient_b_(w, w_b, dw, dw_b, n_cell, gh);
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient w: " << w_b[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    w_b[n_cell/2],
+    std::chrono::duration<double>(end-start).count()
+  );
 }
 
-inline
-double benchmark_roe_flux_tapenade_reverse(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_roe_flux_tapenade_reverse(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -70,26 +74,29 @@ double benchmark_roe_flux_tapenade_reverse(int n_iter, int n_cell) {
   
   // Initialize fields
   for(int i=0; i < sz; ++i){
-     surfx[i] = i; 
-     surfy[i] = i; 
-     surfz[i] = i; 
+    surfx[i] = i; 
+    surfy[i] = i; 
+    surfz[i] = i; 
 
-      rho [i] = i; 
-      velx[i] = i; 
-      vely[i] = i; 
-      velz[i] = i; 
-      temp[i] = i; 
-
-    flux1_b[i] = i;
-    flux2_b[i] = i;
-    flux3_b[i] = i;
-    flux4_b[i] = i;
-    flux5_b[i] = i;
+    rho [i] = i; 
+    velx[i] = i; 
+    vely[i] = i; 
+    velz[i] = i; 
+    temp[i] = i; 
   }
   
   // Compute
   auto start = std::chrono::system_clock::now();
   for (int iter=0; iter<n_iter; ++iter) {
+    // Reset array
+    for(int i=0; i<sz; ++i) {
+      flux1_b[i] = double(i)/(iter+1);
+      flux2_b[i] = double(i)/(iter+1);
+      flux3_b[i] = double(i)/(iter+1);
+      flux4_b[i] = double(i)/(iter+1);
+      flux5_b[i] = double(i)/(iter+1);
+    }
+
     roe_flux_b_(
       rho, rho_b, velx, velx_b, vely, vely_b, velz, velz_b, temp, temp_b, 
       surfx, surfy, surfz, 
@@ -99,6 +106,8 @@ double benchmark_roe_flux_tapenade_reverse(int n_iter, int n_cell) {
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "gradient rho: " << rho_b[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    rho_b[n_cell/2],
+    std::chrono::duration<double>(end-start).count()
+  );
 }

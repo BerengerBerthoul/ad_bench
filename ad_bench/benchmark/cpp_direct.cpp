@@ -1,13 +1,13 @@
-#pragma once
+#include "ad_bench/benchmark/all.hpp"
 
 #include <vector>
 #include <iostream>
 #include <chrono>
 
+#include "ad_bench/benchmark/all.hpp"
 #include "ad_bench/operation/all.hpp"
 
-inline
-double benchmark_centered_gradient_fortran(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_centered_gradient_cpp(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -21,18 +21,21 @@ double benchmark_centered_gradient_fortran(int n_iter, int n_cell) {
   }
   
   // Compute
+  double cnt = 0;
   auto start = std::chrono::system_clock::now();
   for(int iter=0; iter<n_iter; ++iter) {
-    centered_gradient_(w, dw, n_cell, gh);
+    centered_gradient(w, dw, n_cell, gh);
+    cnt += dw[n_cell/2];
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "dw: " << dw[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    dw[n_cell/2]+cnt,
+    std::chrono::duration<double>(end-start).count()
+  );
 }
 
-inline
-double benchmark_roe_flux_fortran(int n_iter, int n_cell) {
+std::pair<double,double> benchmark_roe_flux_cpp(int n_iter, int n_cell) {
   int gh = 2;
   int sz = n_cell+2*gh;
   
@@ -69,7 +72,7 @@ double benchmark_roe_flux_fortran(int n_iter, int n_cell) {
   // Compute
   auto start = std::chrono::system_clock::now();
   for (int iter=0; iter<n_iter; ++iter) {
-    roe_flux_(
+    roe_flux(
       rho, velx, vely, velz, temp, 
       surfx, surfy, surfz, 
       flux1, flux2, flux3, flux4, flux5, 
@@ -78,6 +81,8 @@ double benchmark_roe_flux_fortran(int n_iter, int n_cell) {
   }
   auto end = std::chrono::system_clock::now();
   
-  std::cout << "flux rho: " << flux1[n_cell/2] << "\t";
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  return std::make_pair(
+    flux1[n_cell/2],
+    std::chrono::duration<double>(end-start).count()
+  );
 }

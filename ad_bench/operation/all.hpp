@@ -6,9 +6,9 @@
 
 // Fortran functions
 extern "C" {
-  void centered_gradient_  (double* dw             , double* w            , int& im, int& gh );
-  void centered_gradient_d_(double* dw, double* dwd, double* w, double* wd, int& im, int& gh );
-  void centered_gradient_b_(double* dw, double* dwd, double* w, double* wd, int& im, int& gh );
+  void centered_gradient_  (double* w            , double* dw             , int& im, int& gh );
+  void centered_gradient_d_(double* w, double* wd, double* dw, double* dwd, int& im, int& gh );
+  void centered_gradient_b_(double* w, double* wd, double* dw, double* dwd, int& im, int& gh );
 
   void roe_flux_(
     double* rho, 
