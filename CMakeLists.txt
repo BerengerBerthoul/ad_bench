@@ -4,15 +4,30 @@ set(CMAKE_FORTRAN_COMPILER_ENV_VAR gfortran)
 
 ## Project ##
 project(
-  ad_bench VERSION 0.1.0
+  ad_bench
   DESCRIPTION	"Algorithmic differentiation benchmark between source code transformation and operator overloading"
+  VERSION 0.1.0
   LANGUAGES	CXX Fortran
 )
+
+## Dependencies ##
+### CoDiPack ###
+include(FetchContent)
+find_package(Git REQUIRED)
+FetchContent_Declare(
+  codipack
+  GIT_REPOSITORY https://github.com/SciCompKL/CoDiPack.git
+  GIT_TAG        v1.9.1
+)
+FetchContent_GetProperties(codipack)
+if(NOT codipack_POPULATED)
+  FetchContent_Populate(codipack)
+endif()
+set(codipack_include_dir ${codipack_SOURCE_DIR}/include)
 
 ## Find files ##
 set(src_dir ${PROJECT_SOURCE_DIR}/${PROJECT_NAME})
 set(include_dir ${PROJECT_SOURCE_DIR})
-set(codipack_include_dir ${PROJECT_SOURCE_DIR}/external/codipack)
 
 file(GLOB_RECURSE cpp_and_fortran_files
   "${src_dir}/*.cpp"
@@ -21,10 +36,6 @@ file(GLOB_RECURSE cpp_and_fortran_files
 
 ## Compiler flags ##
 # TODO move
-#add_compile_options(-Wall -fmax-errors=2 -Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC)
-#add_compile_options(-Wall -fmax-errors=2 -ftemplate-backtrace-limit=0 -Winline -O2 -march=native -DNDEBUG -finline-limit=100000 --param large-function-insns=10000 --param large-stack-frame-growth=10000 --param inline-unit-growth=10000 --param early-inlining-insns=1000 --param max-early-inliner-iterations=1000 -fopenmp -fPIC)
-#add_compile_options(-Wall -fmax-errors=2 -ftemplate-backtrace-limit=0 -Winline -O2 -march=native -DNDEBUG -finline-limit=100000 --param large-function-insns=10000 --param inline-unit-growth=200 --param inline-min-speedup=1 -fopenmp -fPIC)
-
 set(CMAKE_CXX_FLAGS  "-std=c++14 -Wall -fmax-errors=2")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast -fno-math-errno -march=native -DNDEBUG -finline-limit=100000 --param large-function-insns=10000 --param large-stack-frame-growth=10000 --param inline-unit-growth=10000 --param early-inlining-insns=1000 --param max-early-inliner-iterations=1000 -fopenmp -fPIC")
 set(CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_RELEASE} -Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC")
