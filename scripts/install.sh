@@ -21,30 +21,9 @@ cmake -S . -Bbuild/ \
 #(cd build && make clean)
 cmake --build build/ -- -j24 &&
 
-
-## launch unit tests ##
-#134217728=512*512*512
-
 (cd build
 ./ad_bench)
 
-#(cd build
-##./ad_bench 1 134217728 1 0
-##./ad_bench 1 134217728 1 1
-##./ad_bench 1 134217728 1 2
-##./ad_bench 1 134217728 2 0
-##./ad_bench 10 134217728 2 1
-##./ad_bench 1 1048576 2 1
-#./ad_bench 1 1048576 2 2
-##./ad_bench 1 134217728 2 2
-#
-##./ad_bench 200 1048576 1 0
-##./ad_bench 200 1048576 1 1
-##./ad_bench 200 1048576 1 2
-##./ad_bench 200 1048576 2 0
-##./ad_bench 200 1048576 2 1
-##./ad_bench 200 1048576 2 2
-#)
 
 #valgrind --tool=massif --massif-out-file=zz_mem_directFortranT1   ./xx_directFortranT1.x   $NITER $MESHSIZE  
 #valgrind --tool=massif --massif-out-file=zz_mem_directFortranT2   ./xx_directFortranT2.x   $NITER $MESHSIZE  

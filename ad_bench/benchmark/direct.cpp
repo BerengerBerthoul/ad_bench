@@ -5,53 +5,19 @@
 
 #include "ad_bench/benchmark/all.hpp"
 #include "ad_bench/operation/all.hpp"
+
+#include "ad_bench/sim_fields.hpp"
+#include "ad_bench/centered_grad.hpp"
+#include "ad_bench/roe_flux.hpp"
+
 #include <benchmark/benchmark.h>
-#include <iostream>
-
-
-template<
-  class variable_field_type, class variable_enum,
-  class param_field_type, class param_enum
->
-class Sim_fields {
-  private:
-    int sz;
-    std::array< std::vector<variable_field_type> ,variable_enum::nb_var_fields  > var_fields;
-    std::array< std::vector<   param_field_type> ,   param_enum::nb_param_fields> param_fields;
-  public:
-    Sim_fields(int nb_cells, int nb_fict_cells)
-      : sz(nb_cells+2*nb_fict_cells)
-    {
-      // allocate field memory
-      for (auto& var_field : var_fields) {
-        var_field = std::vector<variable_field_type>(sz);
-      }
-      for (auto& param_field : param_fields) {
-        param_field = std::vector<param_field_type>(sz);
-      }
-    }
-
-    int size() const { return sz; }
-
-    variable_field_type* operator()(variable_enum i){ return var_fields[i].data(); };
-    param_field_type* operator()(param_enum i){ return param_fields[i].data(); };
-};
 
 namespace centered_grad_case {
-  enum param_field_e {
-    nb_param_fields=0 // no parameter field needed to compute centered gradient
-  };
-
   namespace direct {
-    enum var_field_e {
-      w,
-      dw,
-      nb_var_fields
-    };
-    using Fields = Sim_fields<double,var_field_e,double,param_field_e>;
+    using fields = sim_fields<double,var_field_e,double,param_field_e>;
 
-    Fields initialize(int nb_cells, int nb_fict_cells) {
-      Fields flds(nb_cells,nb_fict_cells);
+    fields initialize(int nb_cells, int nb_fict_cells) {
+      fields flds(nb_cells,nb_fict_cells);
       for (int i=0; i<flds.size(); ++i) {
         flds(w)[i] = i;
       }
@@ -84,21 +50,11 @@ namespace centered_grad_case {
 
 
 namespace roe_flux_case {
-  enum param_field_e {
-    surf_x, surf_y, surf_z,
-    nb_param_fields
-  };
-
   namespace direct {
-    enum var_field_e {
-      rho,u,v,w,T,
-      f_rho,f_u,f_v,f_w,f_T,
-      nb_var_fields
-    };
-    using Fields = Sim_fields<double,var_field_e,double,param_field_e>;
+    using fields = sim_fields<double,var_field_e,double,param_field_e>;
 
-    Fields initialize(int nb_cells, int nb_fict_cells) {
-      Fields flds(nb_cells,nb_fict_cells);
+    fields initialize(int nb_cells, int nb_fict_cells) {
+      fields flds(nb_cells,nb_fict_cells);
       for (int i=0; i<flds.size(); ++i) {
         flds(surf_x)[i] = i;
         flds(surf_y)[i] = i;
