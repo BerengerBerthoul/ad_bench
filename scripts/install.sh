@@ -8,7 +8,7 @@ export FC=gfortran
 cd ..
 cmake -S . -Bbuild/ \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_Fortran_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -ftree-vectorize -ftree-loop-vectorize -fvect-cost-model=unlimited -mprefer-vector-width=512 -ftree-loop-optimize -ftree-vectorize" \
+  -DCMAKE_Fortran_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fPIC -ffast-math -ftree-vectorize -ftree-loop-vectorize -fvect-cost-model=unlimited -mprefer-vector-width=512 -ftree-loop-optimize -ftree-vectorize" \
   -DCMAKE_CXX_FLAGS="-Wall" \
   -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC" \
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF && \
@@ -23,6 +23,7 @@ cmake --build build/ -- -j24 &&
 
 (cd build
 ./ad_bench)
+#./ad_bench --benchmark_repetitions=5)
 
 
 #valgrind --tool=massif --massif-out-file=zz_mem_directFortranT1   ./xx_directFortranT1.x   $NITER $MESHSIZE  

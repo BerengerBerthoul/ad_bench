@@ -38,7 +38,6 @@ subroutine roe_flux( &
   gam1_1 = 1./gam1
   rgaz   = 237.
   
-  !$DIR SIMD
   do i=1,im
     sc1 = surfx(i)
     sc2 = surfy(i)
