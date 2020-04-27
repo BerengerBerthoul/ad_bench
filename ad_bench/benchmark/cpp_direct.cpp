@@ -1,88 +1,147 @@
 #include "ad_bench/benchmark/all.hpp"
 
+#include <array>
 #include <vector>
-#include <iostream>
-#include <chrono>
 
 #include "ad_bench/benchmark/all.hpp"
 #include "ad_bench/operation/all.hpp"
+#include <benchmark/benchmark.h>
+#include <iostream>
 
-std::pair<double,double> benchmark_centered_gradient_cpp(int n_iter, int n_cell) {
-  int gh = 2;
-  int sz = n_cell+2*gh;
-  
-  // Creation
-  std::vector<double>  w_vec(sz); double* w = w_vec.data();
-  std::vector<double> dw_vec(sz); double* dw = dw_vec.data();
-  
-  // Initialize
-  for (int i=0; i<sz; ++i) {
-    w[i] = i;
-  }
-  
-  // Compute
-  double cnt = 0;
-  auto start = std::chrono::system_clock::now();
-  for(int iter=0; iter<n_iter; ++iter) {
-    centered_gradient(w, dw, n_cell, gh);
-    cnt += dw[n_cell/2];
-  }
-  auto end = std::chrono::system_clock::now();
-  
-  return std::make_pair(
-    dw[n_cell/2]+cnt,
-    std::chrono::duration<double>(end-start).count()
-  );
-}
 
-std::pair<double,double> benchmark_roe_flux_cpp(int n_iter, int n_cell) {
-  int gh = 2;
-  int sz = n_cell+2*gh;
-  
-  // Creation
-  std::vector<double> surfx_vec(sz); double* surfx = surfx_vec.data();
-  std::vector<double> surfy_vec(sz); double* surfy = surfy_vec.data();
-  std::vector<double> surfz_vec(sz); double* surfz = surfz_vec.data();
+template<
+  class variable_field_type, class variable_enum,
+  class param_field_type, class param_enum
+>
+class Sim_fields {
+  private:
+    int sz;
+    std::array< std::vector<variable_field_type> ,variable_enum::nb_var_fields  > var_fields;
+    std::array< std::vector<   param_field_type> ,   param_enum::nb_param_fields> param_fields;
+  public:
+    Sim_fields(int nb_cells, int nb_fict_cells)
+      : sz(nb_cells+2*nb_fict_cells)
+    {
+      // allocate field memory
+      for (auto& var_field : var_fields) {
+        var_field = std::vector<variable_field_type>(sz);
+      }
+      for (auto& param_field : param_fields) {
+        param_field = std::vector<param_field_type>(sz);
+      }
+    }
 
-  std::vector<double>   rho_vec(sz); double*   rho =   rho_vec.data();
-  std::vector<double>  velx_vec(sz); double*  velx =  velx_vec.data();
-  std::vector<double>  vely_vec(sz); double*  vely =  vely_vec.data();
-  std::vector<double>  velz_vec(sz); double*  velz =  velz_vec.data();
-  std::vector<double>  temp_vec(sz); double*  temp =  temp_vec.data();
+    int size() const { return sz; }
 
-  std::vector<double> flux1_vec(sz); double* flux1 = flux1_vec.data();
-  std::vector<double> flux2_vec(sz); double* flux2 = flux2_vec.data();
-  std::vector<double> flux3_vec(sz); double* flux3 = flux3_vec.data();
-  std::vector<double> flux4_vec(sz); double* flux4 = flux4_vec.data();
-  std::vector<double> flux5_vec(sz); double* flux5 = flux5_vec.data();
-  
-  // Initialize
-  for(int i=0; i<sz; ++i){
-    surfx[i] = i;
-    surfy[i] = i;
-    surfz[i] = i;
+    variable_field_type* operator()(variable_enum i){ return var_fields[i].data(); };
+    param_field_type* operator()(param_enum i){ return param_fields[i].data(); };
+};
 
-    rho  [i] = i;
-    velx [i] = i;
-    vely [i] = i;
-    velz [i] = i;
-    temp [i] = i;
-  }
-  
-  // Compute
-  auto start = std::chrono::system_clock::now();
-  for (int iter=0; iter<n_iter; ++iter) {
-    roe_flux(
-      rho, velx, vely, velz, temp, 
-      surfx, surfy, surfz, 
-      flux1, flux2, flux3, flux4, flux5, 
-      n_cell, gh
-    );
-  }
-  auto end = std::chrono::system_clock::now();
-  
-  return std::make_pair(
-    flux1[n_cell/2],
-    std::chrono::duration<double>(end-start).count()
-  );
-}
+namespace centered_grad_case {
+  enum param_field_e {
+    nb_param_fields=0 // no parameter field needed to compute centered gradient
+  };
+
+  namespace direct {
+    enum var_field_e {
+      w,
+      dw,
+      nb_var_fields
+    };
+    using Fields = Sim_fields<double,var_field_e,double,param_field_e>;
+
+    Fields initialize(int nb_cells, int nb_fict_cells) {
+      Fields flds(nb_cells,nb_fict_cells);
+      for (int i=0; i<flds.size(); ++i) {
+        flds(w)[i] = i;
+      }
+      return flds;
+    }
+
+    double compute_cpp(benchmark::State& state) {
+      int nb_cells = state.range(0);
+      int nb_fict_cells = 2;
+      auto flds = initialize(nb_cells,nb_fict_cells);
+
+      for (auto _ : state) {
+        centered_gradient(flds(w), flds(dw), nb_cells, nb_fict_cells);
+      }
+      return flds(dw)[nb_cells/2];
+    }
+    double compute_fortran(benchmark::State& state) {
+      int nb_cells = state.range(0);
+      int nb_fict_cells = 2;
+      auto flds = initialize(nb_cells,nb_fict_cells);
+
+      for (auto _ : state) {
+        centered_gradient_(flds(w), flds(dw), nb_cells, nb_fict_cells);
+      }
+      return flds(dw)[nb_cells/2];
+    }
+  } // direct
+} // centered_grad_case
+
+
+
+namespace roe_flux_case {
+  enum param_field_e {
+    surf_x, surf_y, surf_z,
+    nb_param_fields
+  };
+
+  namespace direct {
+    enum var_field_e {
+      rho,u,v,w,T,
+      f_rho,f_u,f_v,f_w,f_T,
+      nb_var_fields
+    };
+    using Fields = Sim_fields<double,var_field_e,double,param_field_e>;
+
+    Fields initialize(int nb_cells, int nb_fict_cells) {
+      Fields flds(nb_cells,nb_fict_cells);
+      for (int i=0; i<flds.size(); ++i) {
+        flds(surf_x)[i] = i;
+        flds(surf_y)[i] = i;
+        flds(surf_z)[i] = i;
+
+        flds(rho)[i] = i;
+        flds(u)[i] = i;
+        flds(v)[i] = i;
+        flds(w)[i] = i;
+        flds(T)[i] = i;
+      }
+      return flds;
+    }
+
+    double compute_cpp(benchmark::State& state) {
+      int nb_cells = state.range(0);
+      int nb_fict_cells = 2;
+      auto flds = initialize(nb_cells,nb_fict_cells);
+
+      for (auto _ : state) {
+        roe_flux(
+          flds(rho), flds(u), flds(v), flds(w), flds(T), 
+          flds(surf_x), flds(surf_y), flds(surf_z), 
+          flds(f_rho), flds(f_u), flds(f_v), flds(f_w), flds(f_T), 
+          nb_cells, nb_fict_cells
+        );
+      }
+      return flds(f_rho)[nb_cells/2];
+    }
+    double compute_fortran(benchmark::State& state) {
+      int nb_cells = state.range(0);
+      int nb_fict_cells = 2;
+      auto flds = initialize(nb_cells,nb_fict_cells);
+
+      for (auto _ : state) {
+        roe_flux_(
+          flds(rho), flds(u), flds(v), flds(w), flds(T), 
+          flds(surf_x), flds(surf_y), flds(surf_z), 
+          flds(f_rho), flds(f_u), flds(f_v), flds(f_w), flds(f_T), 
+          nb_cells, nb_fict_cells
+        );
+      }
+      return flds(f_rho)[nb_cells/2];
+    }
+  } // direct
+} //roe_flux_case

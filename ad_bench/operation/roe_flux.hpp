@@ -3,6 +3,8 @@
 #include <cmath>
 
 template<typename T>
+__attribute__((noinline)) // because has to be like that with the Fortran version (when we call it from C++)
+                          // and we want the benchmark to be fair
 void roe_flux(
   const T* rho, 
   const T* velx, 
@@ -24,7 +26,7 @@ void roe_flux(
   constexpr double gam1_1 = 1./gam1;
   constexpr double rgaz   = 237.;
   
-  // #pragma omp simd TODO: actually makes it slower
+  #pragma omp simd // TODO: actually makes it slower with CoDiPack
   for(int i=gh; i<n_cell-gh ; ++i) {
     auto sc1 = surfx[i];
     auto sc2 = surfy[i];
@@ -38,7 +40,6 @@ void roe_flux(
     
     auto wfl1 = rho[i-1];
     auto wfr1 = rho[i  ];
-    
     auto wfl2 = velx[i-1];
     auto wfr2 = velx[i  ];
     auto wfl3 = vely[i-1];

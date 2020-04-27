@@ -56,17 +56,10 @@ file(GLOB_RECURSE cpp_and_fortran_files
   "${src_dir}/*.f90"
 )
 
-## Compiler flags ##
-# TODO move
-set(CMAKE_CXX_FLAGS  "-std=c++14 -Wall -fmax-errors=2")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast -fno-math-errno -march=native -DNDEBUG -finline-limit=100000 --param large-function-insns=10000 --param large-stack-frame-growth=10000 --param inline-unit-growth=10000 --param early-inlining-insns=1000 --param max-early-inliner-iterations=1000 -fopenmp -fPIC")
-set(CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_RELEASE} -Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC")
-set(CMAKE_BUILD_TYPE "Release")
-
-
 ## Executable ##
 add_executable(${PROJECT_NAME} ${cpp_and_fortran_files})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+target_compile_options(${PROJECT_NAME} PRIVATE -finline-limit=100000 "SHELL:--param large-function-insns=10000" "SHELL:--param large-stack-frame-growth=10000" "SHELL:--param inline-unit-growth=10000" "SHELL:--param early-inlining-insns=1000" "SHELL:--param max-early-inliner-iterations=1000 -mfma -ffast-math -ftree-vectorize -ftree-loop-vectorize -fvect-cost-model=unlimited -mprefer-vector-width=512 -ftree-loop-optimize -ftree-vectorize")
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${codipack_include_dir}>
   $<BUILD_INTERFACE:${include_dir}>
