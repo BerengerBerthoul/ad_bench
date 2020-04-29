@@ -1,9 +1,5 @@
 #include "ad_bench/benchmark/all.hpp"
 
-#include <array>
-#include <vector>
-
-#include "ad_bench/benchmark/all.hpp"
 #include "ad_bench/operation/all.hpp"
 
 #include "ad_bench/sim_fields.hpp"
@@ -11,6 +7,7 @@
 #include "ad_bench/roe_flux.hpp"
 
 #include <benchmark/benchmark.h>
+#include <gtest/gtest.h>
 
 namespace centered_grad_case {
   namespace direct {
@@ -24,7 +21,7 @@ namespace centered_grad_case {
       return flds;
     }
 
-    double compute_cpp(benchmark::State& state) {
+    void compute_cpp(benchmark::State& state) {
       int nb_cells = state.range(0);
       int nb_fict_cells = 2;
       auto flds = initialize(nb_cells,nb_fict_cells);
@@ -32,9 +29,9 @@ namespace centered_grad_case {
       for (auto _ : state) {
         centered_gradient(flds(w), flds(dw), nb_cells, nb_fict_cells);
       }
-      return flds(dw)[nb_cells/2];
+      state.counters["dw[nb_cells/2]"] = flds(dw)[nb_cells/2];
     }
-    double compute_fortran(benchmark::State& state) {
+    void compute_fortran(benchmark::State& state) {
       int nb_cells = state.range(0);
       int nb_fict_cells = 2;
       auto flds = initialize(nb_cells,nb_fict_cells);
@@ -42,7 +39,7 @@ namespace centered_grad_case {
       for (auto _ : state) {
         centered_gradient_(flds(w), flds(dw), nb_cells, nb_fict_cells);
       }
-      return flds(dw)[nb_cells/2];
+      state.counters["dw[nb_cells/2]"] = flds(dw)[nb_cells/2];
     }
   } // direct
 } // centered_grad_case
@@ -69,7 +66,7 @@ namespace roe_flux_case {
       return flds;
     }
 
-    double compute_cpp(benchmark::State& state) {
+    void compute_cpp(benchmark::State& state) {
       int nb_cells = state.range(0);
       int nb_fict_cells = 2;
       auto flds = initialize(nb_cells,nb_fict_cells);
@@ -82,9 +79,9 @@ namespace roe_flux_case {
           nb_cells, nb_fict_cells
         );
       }
-      return flds(f_rho)[nb_cells/2];
+      state.counters["f_rho[nb_cells/2]"] = flds(f_rho)[nb_cells/2];
     }
-    double compute_fortran(benchmark::State& state) {
+    void compute_fortran(benchmark::State& state) {
       int nb_cells = state.range(0);
       int nb_fict_cells = 2;
       auto flds = initialize(nb_cells,nb_fict_cells);
@@ -97,7 +94,7 @@ namespace roe_flux_case {
           nb_cells, nb_fict_cells
         );
       }
-      return flds(f_rho)[nb_cells/2];
+      state.counters["f_rho[nb_cells/2]"] = flds(f_rho)[nb_cells/2];
     }
   } // direct
 } //roe_flux_case

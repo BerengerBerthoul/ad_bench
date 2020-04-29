@@ -46,6 +46,9 @@ if(NOT googlebench_POPULATED)
   FetchContent_Populate(googlebench)
   add_subdirectory(${googlebench_SOURCE_DIR} ${googlebench_BINARY_DIR})
 endif()
+### ADOLC ###
+set(CMAKE_MODULE_PATH "scripts/cmake" ${CMAKE_MODULE_PATH})
+find_package(ADOLC REQUIRED)
 
 ## Find files ##
 set(src_dir ${PROJECT_SOURCE_DIR}/${PROJECT_NAME})
@@ -59,7 +62,6 @@ file(GLOB_RECURSE cpp_and_fortran_files
 ## Executable ##
 add_executable(${PROJECT_NAME} ${cpp_and_fortran_files})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-# target_compile_options(${PROJECT_NAME} PRIVATE -finline-limit=100000 "SHELL:--param large-function-insns=10000" "SHELL:--param large-stack-frame-growth=10000" "SHELL:--param inline-unit-growth=10000" "SHELL:--param early-inlining-insns=1000" "SHELL:--param max-early-inliner-iterations=1000 -mfma -ffast-math -ftree-vectorize -ftree-loop-vectorize -fvect-cost-model=unlimited -mprefer-vector-width=512 -ftree-loop-optimize -ftree-vectorize")
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${codipack_include_dir}>
   $<BUILD_INTERFACE:${include_dir}>
@@ -69,6 +71,7 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
     benchmark
     gtest
+    ADOLC::ADOLC
 )
 
 ### Install ###
@@ -78,9 +81,9 @@ install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
-install(EXPORT ${PROJECT_NAME}Targets
-  FILE ${PROJECT_NAME}Config.cmake # no dependency
-  NAMESPACE ${PROJECT_NAME}::
-  DESTINATION lib/cmake/${PROJECT_NAME}
-)
+#install(EXPORT ${PROJECT_NAME}Targets
+#  FILE ${PROJECT_NAME}Config.cmake # no dependency
+#  NAMESPACE ${PROJECT_NAME}::
+#  DESTINATION lib/cmake/${PROJECT_NAME}
+#)
 install(DIRECTORY ${src_dir} DESTINATION include FILES_MATCHING PATTERN "*.hpp")
