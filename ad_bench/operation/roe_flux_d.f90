@@ -192,7 +192,7 @@ SUBROUTINE ROE_FLUX_D(rho, rhod, velx, velxd, vely, velyd, velz, velzd, &
   END DO
 END SUBROUTINE ROE_FLUX_D
 
-SUBROUTINE ROE_FLUX_D2(rho, rhod, velx, velxd, vely, velyd, velz, velzd, &
+SUBROUTINE ROE_FLUX_D_TANGENT_ONLY(rho, rhod, velx, velxd, vely, velyd, velz, velzd, &
 & temp, tempd, surfx, surfy, surfz, flux1, flux1d, flux2, flux2d, flux3&
 & , flux3d, flux4, flux4d, flux5, flux5d, im, gh)
   IMPLICIT NONE
@@ -321,5 +321,4 @@ SUBROUTINE ROE_FLUX_D2(rho, rhod, velx, velxd, vely, velyd, velz, velzd, &
     flux4d(i) = 0.5d0*sn*(nx*fcdx4d+ny*fcdy4d+nz*fcdz4d)
     flux5d(i) = 0.5d0*sn*(nx*fcdx5d+ny*fcdy5d+nz*fcdz5d)
   END DO
-END SUBROUTINE ROE_FLUX_D2
-
+END SUBROUTINE ROE_FLUX_D_TANGENT_ONLY
