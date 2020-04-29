@@ -1,3 +1,4 @@
+! tapenade ../ad_bench/operation/roe_flux.f90 -head "roe_flux(flux1 flux2 flux3 flux4 flux5)/(rho velx vely velz temp)" -d -optim diffliveness
 subroutine roe_flux( &
   rho, velx, vely, velz, temp, &
   surfx, surfy, surfz, &
@@ -28,7 +29,7 @@ subroutine roe_flux( &
   real(8) :: pp,pm
   real(8) :: hm,hp
   real(8) :: nx,ny,nz,sn
-  
+
   real(8) :: fcdx1,fcdx2,fcdx3,fcdx4,fcdx5,fcdx6
   real(8) :: fcdy1,fcdy2,fcdy3,fcdy4,fcdy5,fcdy6
   real(8) :: fcdz1,fcdz2,fcdz3,fcdz4,fcdz5,fcdz6
@@ -37,7 +38,7 @@ subroutine roe_flux( &
   gam1   = gam-1.
   gam1_1 = 1./gam1
   rgaz   = 237.
-  
+
   do i=1,im
     sc1 = surfx(i)
     sc2 = surfy(i)
@@ -62,7 +63,7 @@ subroutine roe_flux( &
 
     pm = wfl1*wfl5*rgaz
     pp = wfr1*wfr5*rgaz
-    
+
     hm  = gam*gam1_1*wfl5*rgaz + 0.5d0*(wfl2*wfl2 + wfl3*wfl3 + wfl4*wfl4 )
     hp  = gam*gam1_1*wfr5*rgaz + 0.5d0*(wfr2*wfr2 + wfr3*wfr3 + wfr4*wfr4 )
 

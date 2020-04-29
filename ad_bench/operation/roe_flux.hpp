@@ -6,38 +6,38 @@ template<typename T>
 __attribute__((noinline)) // because has to be like that with the Fortran version (when we call it from C++)
                           // and we want the benchmark to be fair
 void roe_flux(
-  const T* rho, 
-  const T* velx, 
-  const T* vely, 
-  const T* velz, 
-  const T* temp, 
-  const double* surfx, 
-  const double* surfy, 
-  const double* surfz, 
-  T* flux1, 
-  T* flux2, 
-  T* flux3, 
-  T* flux4, 
-  T* flux5, 
+  const T* __restrict__ rho,
+  const T* __restrict__ velx,
+  const T* __restrict__ vely,
+  const T* __restrict__ velz,
+  const T* __restrict__ temp,
+  const double* __restrict__ surfx,
+  const double* __restrict__ surfy,
+  const double* __restrict__ surfz,
+  T* __restrict__ flux1,
+  T* __restrict__ flux2,
+  T* __restrict__ flux3,
+  T* __restrict__ flux4,
+  T* __restrict__ flux5,
   int n_cell, int gh
 ) {
   constexpr double gam    = 1.4;
   constexpr double gam1   = gam-1.;
   constexpr double gam1_1 = 1./gam1;
   constexpr double rgaz   = 237.;
-  
+
   //#pragma omp simd // TODO: actually makes it slower with CoDiPack
   for(int i=gh; i<n_cell-gh ; ++i) {
     auto sc1 = surfx[i];
     auto sc2 = surfy[i];
     auto sc3 = surfz[i];
     auto sn  = std::sqrt(sc1*sc1 + sc2*sc2 + sc3*sc3);
-    
+
     auto invsn = 1./std::max(sn,1.e-32);
     auto nx    = sc1*invsn;
     auto ny    = sc2*invsn;
     auto nz    = sc3*invsn;
-    
+
     auto wfl1 = rho[i-1];
     auto wfr1 = rho[i  ];
     auto wfl2 = velx[i-1];
@@ -48,13 +48,13 @@ void roe_flux(
     auto wfr4 = velz[i  ];
     auto wfl5 = temp[i-1];
     auto wfr5 = temp[i  ];
-    
+
     auto pm = wfl1*wfl5*rgaz;
     auto pp = wfr1*wfr5*rgaz;
-    
+
     auto hm  = gam*gam1_1*wfl5*rgaz + 0.5*(wfl2*wfl2 + wfl3*wfl3 + wfl4*wfl4);
     auto hp  = gam*gam1_1*wfr5*rgaz + 0.5*(wfr2*wfr2 + wfr3*wfr3 + wfr4*wfr4);
-    
+
     auto fcdx1 = wfr1*wfr2 + wfl1*wfl2;
     auto fcdy1 = wfr1*wfr3 + wfl1*wfl3;
     auto fcdz1 = wfr1*wfr4 + wfl1*wfl4;
