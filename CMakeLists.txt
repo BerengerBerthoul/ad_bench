@@ -49,6 +49,8 @@ endif()
 ### ADOLC ###
 set(CMAKE_MODULE_PATH "scripts/cmake" ${CMAKE_MODULE_PATH})
 find_package(ADOLC REQUIRED)
+message(ADOLC_INCLUDE_DIR)
+message(${ADOLC_INCLUDE_DIR})
 
 ## Find files ##
 set(src_dir ${PROJECT_SOURCE_DIR}/${PROJECT_NAME})

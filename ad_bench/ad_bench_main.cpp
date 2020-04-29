@@ -26,13 +26,17 @@ int main(int argc, char* argv[]) {
 
   REGISTER_BENCHMARK(centered_grad_case::tangent::compute_tapenade, centered_grad_base_size, nb_meshes);
   REGISTER_BENCHMARK(centered_grad_case::tangent::compute_codipack, centered_grad_base_size, nb_meshes);
+  REGISTER_BENCHMARK(centered_grad_case::tangent::compute_adolc   , centered_grad_base_size, nb_meshes);
   REGISTER_BENCHMARK(roe_flux_case::tangent::compute_tapenade     , roe_flux_base_size     , nb_meshes);
   REGISTER_BENCHMARK(roe_flux_case::tangent::compute_codipack     , roe_flux_base_size     , nb_meshes);
+  REGISTER_BENCHMARK(roe_flux_case::tangent::compute_adolc        , roe_flux_base_size     , nb_meshes);
 
   REGISTER_BENCHMARK(centered_grad_case::reverse::compute_tapenade, centered_grad_base_size, nb_meshes);
   REGISTER_BENCHMARK(centered_grad_case::reverse::compute_codipack, centered_grad_base_size, nb_meshes);
+  REGISTER_BENCHMARK(centered_grad_case::reverse::compute_adolc   , centered_grad_base_size, nb_meshes);
   REGISTER_BENCHMARK(roe_flux_case::reverse::compute_tapenade     , roe_flux_base_size     , nb_meshes);
   REGISTER_BENCHMARK(roe_flux_case::reverse::compute_codipack     , roe_flux_base_size     , nb_meshes);
+  REGISTER_BENCHMARK(roe_flux_case::reverse::compute_adolc        , roe_flux_base_size     , nb_meshes);
 
   benchmark::Initialize(&argc, argv);
   benchmark::RunSpecifiedBenchmarks();

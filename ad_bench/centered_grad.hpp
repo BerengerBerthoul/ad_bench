@@ -15,7 +15,7 @@ namespace centered_grad_case {
   namespace tangent {
     enum var_field_e {
       w,
-      dw,
+      dw, // TODO sometimes unused (when direct is not computed with tangent)
       delta_w,
       delta_dw,
       nb_var_fields
@@ -24,7 +24,7 @@ namespace centered_grad_case {
   namespace reverse {
     enum var_field_e {
       w,
-      dw,
+      dw, // TODO unused
       lambda_w,
       lambda_dw,
       nb_var_fields

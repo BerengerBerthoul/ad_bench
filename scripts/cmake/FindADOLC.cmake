@@ -3,8 +3,10 @@
 # ADOLC_FOUND       - Do not attempt to use ADOLC if "no" or undefined.
 cmake_minimum_required(VERSION 3.12)
 
-find_path(ADOLC_INCLUDE_DIR NAMES adolc.h PATH_SUFFIXES adolc)
+find_path(ADOLC_INCLUDE_DIR NAMES adolc/adolc.h)
 find_library(FSCOMMON_LIBRARY NAMES libadolc.so)
+message(ADOLC_INCLUDE_DIR)
+message(${ADOLC_INCLUDE_DIR})
 
 mark_as_advanced(ADOLC_INCLUDE_DIR FSCOMMON_LIBRARY)
 
