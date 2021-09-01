@@ -12,11 +12,13 @@ namespace centered_grad_case {
     void compute_tapenade(benchmark::State& state);
     void compute_codipack(benchmark::State& state);
     void compute_adolc(benchmark::State& state);
+    void compute_adept(benchmark::State& state);
   }
   namespace reverse {
     void compute_tapenade(benchmark::State& state);
     void compute_codipack(benchmark::State& state);
     void compute_adolc(benchmark::State& state);
+    void compute_adept(benchmark::State& state);
   }
 }
 
@@ -29,10 +31,12 @@ namespace roe_flux_case {
     void compute_tapenade(benchmark::State& state);
     void compute_codipack(benchmark::State& state);
     void compute_adolc(benchmark::State& state);
+    void compute_adept(benchmark::State& state);
   }
   namespace reverse {
     void compute_tapenade(benchmark::State& state);
     void compute_codipack(benchmark::State& state);
     void compute_adolc(benchmark::State& state);
+    void compute_adept(benchmark::State& state);
   }
 }

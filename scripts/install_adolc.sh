@@ -14,14 +14,14 @@ mkdir -p $ADOLC_DIR
 mkdir -p $ADOLC_INSTALL_DIR
 
 cd $ADOLC_DIR
-#git clone https://github.com/coin-or/ADOL-C.git && \
+git clone https://github.com/coin-or/ADOL-C.git && \
 cd ADOL-C && \
 git checkout releases/2.7.2 && \
 
-#export CXXFLAGS="-O1"
-export CXXFLAGS="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -fno-tree-loop-vectorize"
-export CFLAGS=$CXXFLAGS
-./configure  --prefix=$ADOLC_INSTALL_DIR && \
+export CXXFLAGS="-O3 -march=native -std=c++14 -fopenmp"
+export CFLAGS="-O3 -march=native -fopenmp"
+autoreconf -fi && \
+./configure --prefix=$ADOLC_INSTALL_DIR --with-cxxflags="-O3 -march=native -std=c++14 -fopenmp" && \
 make -v -j24 && \
 make check && \
 make install

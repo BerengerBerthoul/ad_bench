@@ -1,3 +1,4 @@
+module purge
 module load cmake/3.12.3
 module load gcc/9.2
 
@@ -5,10 +6,12 @@ export CC=gcc
 export CXX=g++
 export FC=gfortran
 
-#./install_adolc.sh
+./install_adept.sh && \
+./install_adolc.sh
 
 AD_BENCH_ROOT=$(cd .. && pwd)
 export ADOLC_ROOT=$AD_BENCH_ROOT/build/_deps/adolc/install
+export ADEPT_ROOT=$AD_BENCH_ROOT/build/_deps/adept/install
 
 cd ..
 # cmake -S . -Bbuild/ \
@@ -31,11 +34,18 @@ cd ..
 #  -DCMAKE_Fortran_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -fopt-info -fopt-info-all -fno-tree-vectorize -fno-tree-loop-vectorize  " \
 #  -DCMAKE_CXX_FLAGS="-Wall" \
 #  -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -fopt-info -fopt-info-all -fno-tree-vectorize -fno-tree-loop-vectorize" && \
+
 cmake -S . -Bbuild/ \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_Fortran_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -fno-tree-vectorize -fno-tree-loop-vectorize  " \
   -DCMAKE_CXX_FLAGS="-Wall" \
   -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fno-math-errno -march=native -DNDEBUG -fopenmp -fPIC -ffast-math -fno-tree-vectorize -fno-tree-loop-vectorize" && \
+
+#cmake -S . -Bbuild/ \
+#  -DCMAKE_BUILD_TYPE=Release \
+#  -DCMAKE_Fortran_FLAGS_RELEASE="-O3 -DNDEBUG -fopenmp" \
+#  -DCMAKE_CXX_FLAGS="-Wall" \
+#  -DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG -fopenmp" && \
 
 # NOTE: see CMakeLists.txt for other specific optimization flags
 

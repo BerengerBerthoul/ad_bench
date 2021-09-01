@@ -1,5 +1,7 @@
 build/*
 *.swp
-
+CMakeLists_ini.txt
+build_O3/*
+build_test/*
 *.o
 *.optrpt
